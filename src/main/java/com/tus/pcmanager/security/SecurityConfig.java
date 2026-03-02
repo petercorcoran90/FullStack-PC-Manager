@@ -1,31 +1,41 @@
 package com.tus.pcmanager.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final JwtAuthFilter jwtAuthFilter;
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**")
-						.permitAll().requestMatchers("/api/users/register").permitAll()
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/", "/index.html", "/login.html", "/styles.css", "/script.js", "/login.css",
+								"/login.js", "/images/**")
+						.permitAll().requestMatchers("/api/users/register", "/api/users/login").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/parts/**").permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/parts/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/api/parts/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/api/parts/**").hasRole("ADMIN").anyRequest()
-						.authenticated())
-				.formLogin(form -> form.permitAll().defaultSuccessUrl("/", true)).httpBasic(Customizer.withDefaults())
-				.logout(logout -> logout.logoutSuccessUrl("/login?logout").permitAll());
+						.requestMatchers(HttpMethod.DELETE, "/api/parts/**").hasRole("ADMIN")
+
+						.anyRequest().authenticated())
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
@@ -33,5 +43,10 @@ public class SecurityConfig {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
 	}
 }
