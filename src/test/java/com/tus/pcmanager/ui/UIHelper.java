@@ -50,4 +50,12 @@ public class UIHelper {
 			((JavascriptExecutor) driver).executeScript("window.localStorage.clear();");
 		}
 	}
+	
+    public void dismissAlertIfPresent() {
+        try {
+            driver.switchTo().alert().dismiss();
+        } catch (Exception e) {
+            // No alert present, just continue safely!
+        }
+    }
 }

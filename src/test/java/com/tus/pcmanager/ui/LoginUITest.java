@@ -30,8 +30,10 @@ class LoginUITest {
     @BeforeEach
     void setUp() {
         ui = new UIHelper(driver);
+        ui.dismissAlertIfPresent();
         ui.navigateTo("http://localhost:" + port + "/login.html");
         ui.clearLocalStorage();
+        driver.navigate().refresh();
     }
 
     @Test

@@ -21,6 +21,7 @@ $.ajaxSetup({
 // ==========================================
 $(document).ready(function () {
     // Relative URLs so it works on any port
+	$.fn.dataTable.ext.errMode = 'none';
     const apiPartsUrl = '/api/parts';
     const apiBuildsUrl = '/api/builds';
     
