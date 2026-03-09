@@ -3,15 +3,24 @@ package com.tus.pcmanager.security;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
 
-	private static final String SECRET_KEY = "]0Rm-gn-=&_vm()un!:6Zl#jJqt9pgDY";
-	private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+	@Value("${jwt.secret}")
+	private String secretKey;
+
+	private Key key;
+
+	@PostConstruct
+	public void init() {
+		this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+	}
 
 	public String generateToken(String username) {
 		return Jwts.builder().setSubject(username).setIssuedAt(new Date())

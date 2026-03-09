@@ -1,11 +1,8 @@
 function fn() {
-    var env = karate.env;
+    const env = karate.env || 'dev';
     karate.log('karate.env system property was:', env);
-    if (!env) {
-        env = 'dev';
-    }
 
-    var config = {
+    const config = {
         baseUrl: 'http://localhost:' + karate.properties['local.server.port']
     };
     

@@ -14,28 +14,28 @@
 <body>
 
 	<div id="loginView" class="d-flex align-items-center justify-content-center vh-100">
-			<div class="login-container text-center">
-	            <i class="fa-solid fa-microchip mb-3" style="font-size: 3rem; color: #c850c0;"></i>
-				<h3 class="fw-bold mb-4 text-white">PC Manager 2026</h3>
-				<form id="loginForm" onsubmit="return false;">
-					<div class="mb-3 text-start">
-						<label class="form-label text-white fw-bold">Username</label>
-						<input type="text" id="username" class="form-control" required>
-					</div>
-					<div class="mb-4 text-start">
-						<label class="form-label text-white fw-bold">Password</label>
-						<input type="password" id="password" class="form-control" required>
-					</div>
-					<div class="d-grid gap-2">
-	                    <button type="submit" id="loginBtn" class="btn text-white rounded-pill py-2 fw-bold"
-							style="background-color: #c850c0;">Login</button>
-					</div>
-					<div id="loginErrorMsg" class="alert alert-danger mt-3 d-none">
-						Invalid username or password.
-					</div>
-				</form>
-			</div>
+		<div class="login-container text-center">
+			<i class="fa-solid fa-microchip mb-3" style="font-size: 3rem; color: #c850c0;"></i>
+			<h3 class="fw-bold mb-4 text-white">PC Manager 2026</h3>
+			<form id="loginForm" onsubmit="return false;">
+				<div class="mb-3 text-start">
+					<label for="username" class="form-label text-white fw-bold">Username</label>
+					<input type="text" id="username" class="form-control" required>
+				</div>
+				<div class="mb-4 text-start">
+					<label for="password" class="form-label text-white fw-bold">Password</label>
+					<input type="password" id="password" class="form-control" required>
+				</div>
+				<div class="d-grid gap-2">
+					<button type="submit" id="loginBtn" class="btn text-white rounded-pill py-2 fw-bold"
+						style="background-color: #c850c0;">Login</button>
+				</div>
+				<div id="loginErrorMsg" class="alert alert-danger mt-3 d-none">
+					Invalid username or password.
+				</div>
+			</form>
 		</div>
+	</div>
 
 	<div id="dashboardView" class="d-none">
 		<nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background-color: rgba(0,0,0,0.8);">
@@ -91,17 +91,17 @@
 					<form id="partForm">
 						<input type="hidden" id="partId">
 						<div class="mb-3">
-							<label class="form-label text-muted">Name</label>
+							<label for="partName" class="form-label text-muted">Name</label>
 							<input type="text" class="form-control border-0 bg-light" id="partName" required>
 						</div>
 						<div class="row">
 							<div class="col-md-6 mb-3">
-								<label class="form-label text-muted">Manufacturer</label>
+								<label for="partManufacturer" class="form-label text-muted">Manufacturer</label>
 								<input type="text" class="form-control border-0 bg-light" id="partManufacturer"
 									required>
 							</div>
 							<div class="col-md-6 mb-3">
-								<label class="form-label text-muted">Category</label>
+								<label for="partCategory" class="form-label text-muted">Category</label>
 								<select class="form-select border-0 bg-light" id="partCategory">
 									<option value="CPU">CPU</option>
 									<option value="GPU">GPU</option>
@@ -114,12 +114,12 @@
 						</div>
 						<div class="row">
 							<div class="col-md-6 mb-3">
-								<label class="form-label text-muted">Price (€)</label>
+								<label for="partPrice" class="form-label text-muted">Price (€)</label>
 								<input type="number" step="0.01" class="form-control border-0 bg-light" id="partPrice"
 									required>
 							</div>
 							<div class="col-md-6 mb-3">
-								<label class="form-label text-muted">Quantity</label>
+								<label for="partStock" class="form-label text-muted">Quantity</label>
 								<input type="number" class="form-control border-0 bg-light" id="partStock" required>
 							</div>
 						</div>

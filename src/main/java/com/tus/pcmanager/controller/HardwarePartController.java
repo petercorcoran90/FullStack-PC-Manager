@@ -1,12 +1,12 @@
 package com.tus.pcmanager.controller;
 
+import com.tus.pcmanager.dto.HardwarePartDTO;
 import com.tus.pcmanager.model.HardwarePart;
 import com.tus.pcmanager.service.HardwarePartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -17,11 +17,14 @@ public class HardwarePartController {
     private final HardwarePartService partService;
 
     @GetMapping
-    public ResponseEntity<List<HardwarePart>> getAllParts(@RequestParam(required = false) String search) {
-        if (search != null) {
-            return ResponseEntity.ok(partService.searchParts(search));
+    public ResponseEntity<List<HardwarePartDTO>> getAllParts(@RequestParam(value = "search", required = false) String search) {
+        List<HardwarePartDTO> parts;
+        if (search != null && !search.isEmpty()) {
+            parts = partService.searchParts(search);
+        } else {
+            parts = partService.getAllParts();
         }
-        return ResponseEntity.ok(partService.getAllParts());
+        return ResponseEntity.ok(parts);
     }
 
     @GetMapping("/{id}")

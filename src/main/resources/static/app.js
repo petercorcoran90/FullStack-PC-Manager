@@ -1,11 +1,11 @@
-window.checkAuthState = function() {
+globalThis.checkAuthState = function() {
     const token = localStorage.getItem('jwtToken');
     if (token) {
         $('#loginView').addClass('d-none');
         $('#dashboardView').removeClass('d-none');
         
-        if (typeof window.loadInventory === 'function') {
-            window.loadInventory();
+        if (typeof globalThis.loadInventory === 'function') {
+            globalThis.loadInventory();
         }
     } else {
         $('#dashboardView').addClass('d-none');
@@ -15,5 +15,5 @@ window.checkAuthState = function() {
 };
 
 $(document).ready(function() {
-    window.checkAuthState();
+    globalThis.checkAuthState();
 });

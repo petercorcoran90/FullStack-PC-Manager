@@ -58,7 +58,7 @@ table.dataTable.no-footer {
 
 .custom-table tbody td {
     padding: 16px 20px !important;
-    color: #808080 !important;
+    color: #4d4d4d !important; 
     border-bottom: 1px solid #f2f2f2 !important;
     border-top: none !important;
     border-left: none !important;
@@ -116,9 +116,10 @@ table.dataTable.no-footer {
     color: white !important;
 }
 
+/* --- FIX 1: Solid Hex colors instead of rgba() so Sonar can calculate contrast --- */
 .dataTables_filter input {
-    background: rgba(255,255,255,0.1) !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
+    background: #4a445c !important; 
+    border: 1px solid #5d586e !important;
     color: white !important;
     border-radius: 20px;
     padding: 5px 15px;
@@ -126,11 +127,11 @@ table.dataTable.no-footer {
 }
 
 .dataTables_filter input::placeholder {
-    color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.75); 
 }
 
 .dataTables_filter input:focus {
-    background: rgba(255,255,255,0.2) !important;
+    background: #534c66 !important;
     border-color: white !important;
     box-shadow: none !important;
 }
@@ -142,7 +143,7 @@ table.dataTable.no-footer {
 .page-link {
     background-color: transparent !important;
     border: none !important;
-    color: rgba(255,255,255,0.7) !important;
+    color: rgba(255,255,255,0.85) !important;
     border-radius: 50% !important;
     margin: 0 2px;
     padding: 6px 12px;
@@ -155,20 +156,22 @@ table.dataTable.no-footer {
     background-color: transparent !important;
 }
 
+/* --- FIX 2: Solid Hex colors instead of rgba() so Sonar can calculate contrast --- */
 .page-link:hover {
-    background-color: rgba(255,255,255,0.1) !important;
+    background-color: #4a445c !important;
     color: white !important;
 }
 
+/* --- FIX 3: Darkened the pink slightly so it mathematically passes WCAG 4.5:1 ratio --- */
 .page-item.active .page-link {
-    background-color: #c850c0 !important; 
+    background-color: #a83ea2 !important; 
     color: white !important;
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(200, 80, 192, 0.4) !important;
 }
 
 .page-item.disabled .page-link {
-    color: rgba(255,255,255,0.3) !important;
+    color: rgba(255,255,255,0.55) !important;
 }
 
 .login-container {

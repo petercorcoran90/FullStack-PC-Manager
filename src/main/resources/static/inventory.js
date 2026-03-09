@@ -6,17 +6,19 @@ function getAuthHeaders() {
     return { 'Authorization': 'Bearer ' + localStorage.getItem('jwtToken') };
 }
 
-window.loadInventory = function() {
+globalThis.loadInventory = function() {
     const currentUser = localStorage.getItem('currentUser');
     const userRole = currentUser === "admin" ? "ROLE_ADMIN" : "ROLE_USER";
 
-    if (userRole !== 'ROLE_ADMIN') {
-        $('#addPartBtn').hide();
-    } else {
+    if (userRole === 'ROLE_ADMIN') {
         $('#addPartBtn').show();
+    } else {
+        $('#addPartBtn').hide();
     }
 
-    if (!partsTable) {
+    if (partsTable) {
+        partsTable.ajax.reload();
+    } else {
         $.fn.dataTable.ext.errMode = 'none';
         partsTable = $('#partsTable').DataTable({
             ajax: {
@@ -49,8 +51,6 @@ window.loadInventory = function() {
                 }
             ]
         });
-    } else {
-        partsTable.ajax.reload();
     }
 };
 
@@ -90,8 +90,8 @@ $(document).ready(function() {
             name: $('#partName').val(),
             manufacturer: $('#partManufacturer').val(),
             category: $('#partCategory').val(),
-            price: parseFloat($('#partPrice').val()),
-            stockLevel: parseInt($('#partStock').val())
+            price: Number.parseFloat($('#partPrice').val()),
+            stockLevel: Number.parseInt($('#partStock').val(), 10)
         };
 
         $.ajax({

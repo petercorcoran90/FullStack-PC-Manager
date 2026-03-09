@@ -19,7 +19,7 @@ $(document).ready(function() {
                 $('#loginBtn').text('Login').prop('disabled', false);
                 localStorage.setItem('jwtToken', response.token);
                 localStorage.setItem('currentUser', loginData.username);
-                window.checkAuthState(); 
+                globalThis.checkAuthState(); 
             },
             error: function(xhr) {
                 $('#loginBtn').text('Login').prop('disabled', false);
@@ -31,6 +31,6 @@ $(document).ready(function() {
     $('#logoutBtn').click(function() {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('currentUser');
-        window.checkAuthState(); 
+        globalThis.checkAuthState(); 
     });
 });

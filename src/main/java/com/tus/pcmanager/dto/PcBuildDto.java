@@ -11,5 +11,5 @@ public class PcBuildDto {
     private String buildName;
     private LocalDateTime createdAt;
     private BigDecimal totalPrice;
-    private List<HardwarePartDto> parts;
+    private List<HardwarePartDTO> parts;
 }

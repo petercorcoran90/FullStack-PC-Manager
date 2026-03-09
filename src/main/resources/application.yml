@@ -19,3 +19,4 @@ server:
   error:
     include-stacktrace: always
     include-exception: true
+jwt.secret: "]0Rm-gn-=&_vm()un!:6Zl#jJqt9pgDY"

@@ -1,6 +1,6 @@
 package com.tus.pcmanager.service;
 
-import com.tus.pcmanager.dto.HardwarePartDto;
+import com.tus.pcmanager.dto.HardwarePartDTO;
 import com.tus.pcmanager.dto.PcBuildDto;
 import com.tus.pcmanager.exception.ResourceNotFoundException;
 import com.tus.pcmanager.model.AppUser;
@@ -75,9 +75,9 @@ public class PcBuildService {
 			dto.setCreatedAt(build.getCreatedAt());
 			dto.setTotalPrice(build.getTotalPrice());
 
-			List<HardwarePartDto> partDtos = new ArrayList<>();
+			List<HardwarePartDTO> partDtos = new ArrayList<>();
 			for (HardwarePart part : build.getParts()) {
-				HardwarePartDto partDto = new HardwarePartDto();
+				HardwarePartDTO partDto = new HardwarePartDTO();
 				partDto.setId(part.getId());
 				partDto.setName(part.getName());
 				partDto.setManufacturer(part.getManufacturer());
