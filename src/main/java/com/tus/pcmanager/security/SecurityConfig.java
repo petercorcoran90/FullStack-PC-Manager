@@ -19,34 +19,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final JwtAuthFilter jwtAuthFilter;
+    private final JwtAuthFilter jwtAuthFilter;
 
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/", "/index.html", "/login.html", "/styles.css", "/script.js", "/login.css",
-								"/login.js", "/images/**")
-						.permitAll().requestMatchers("/api/users/register", "/api/users/login").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/parts/**").permitAll()
-						.requestMatchers(HttpMethod.POST, "/api/parts/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/api/parts/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/api/parts/**").hasRole("ADMIN")
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/auth.js", "/inventory.js", "/images/**", "/error").permitAll()
+                        .requestMatchers("/api/users/register", "/api/users/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/parts/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/parts/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/parts/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/parts/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-						.anyRequest().authenticated())
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
 
-		return http.build();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }

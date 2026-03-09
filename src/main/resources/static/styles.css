@@ -1,34 +1,182 @@
 body {
-    background-color: #f8f9fa;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(45deg, #4158d0, #c850c0, #ffcc70);
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.navbar-brand {
+.wrap-table100 {
+    background: #fff;
+    border-radius: 10px;
+    padding: 0; 
+    overflow: hidden;
+    box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.1);
+}
+
+table.dataTable thead th,
+table.dataTable thead td,
+.custom-table thead th {
+    background-color: #36304a !important;
+    color: white !important;
+    font-weight: 500 !important;
+    padding: 18px 20px !important;
+    border: none !important;
+    font-size: 15px;
+}
+
+table.dataTable {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+table.dataTable thead th.sorting:before,
+table.dataTable thead th.sorting:after,
+table.dataTable thead th.sorting_asc:before,
+table.dataTable thead th.sorting_asc:after,
+table.dataTable thead th.sorting_desc:before,
+table.dataTable thead th.sorting_desc:after {
+    color: white !important;
+    opacity: 0.6 !important;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none !important;
+}
+
+.custom-table {
+    margin: 0 !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.custom-table tbody tr {
+    background-color: #fff !important;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f8f9fa !important;
+}
+
+.custom-table tbody td {
+    padding: 16px 20px !important;
+    color: #808080 !important;
+    border-bottom: 1px solid #f2f2f2 !important;
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    vertical-align: middle;
+    font-size: 15px;
+}
+
+.dt-floating-card {
+    background-color: #36304a;
+    color: white !important;
+    border-radius: 50px;
+    padding: 8px 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.dataTables_info, 
+.dataTables_length {
+    color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.9rem;
+}
+
+.dataTables_length select {
+    background-color: #ffffff !important;
+    color: #36304a !important;
+    border: none !important;
+    border-radius: 10px;
+    padding: 4px 30px 4px 15px !important; 
+    outline: none !important;
+    margin: 0 8px;
+    cursor: pointer;
+    color-scheme: light;
+    background-position: right 10px center !important; 
+}
+
+.dataTables_length select:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.dataTables_length select option {
+    background-color: #ffffff;
+    color: #36304a;
+}
+
+.dataTables_length select option:checked {
+    background-color: #36304a !important;
+    color: white !important;
+}
+
+.dataTables_filter label {
+    margin: 0 !important;
+    color: white !important;
+}
+
+.dataTables_filter input {
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    color: white !important;
+    border-radius: 20px;
+    padding: 5px 15px;
+    outline: none !important;
+}
+
+.dataTables_filter input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.dataTables_filter input:focus {
+    background: rgba(255,255,255,0.2) !important;
+    border-color: white !important;
+    box-shadow: none !important;
+}
+
+.pagination {
+    margin: 0 !important;
+}
+
+.page-link {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgba(255,255,255,0.7) !important;
+    border-radius: 50% !important;
+    margin: 0 2px;
+    padding: 6px 12px;
+    transition: all 0.3s ease;
+}
+
+.page-link:focus {
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+}
+
+.page-link:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+.page-item.active .page-link {
+    background-color: #c850c0 !important; 
+    color: white !important;
     font-weight: bold;
-    letter-spacing: 1px;
+    box-shadow: 0 2px 5px rgba(200, 80, 192, 0.4) !important;
 }
 
-h2 {
-    color: #343a40;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 10px;
-    display: inline-block;
+.page-item.disabled .page-link {
+    color: rgba(255,255,255,0.3) !important;
 }
 
-/* DataTables Overrides for Bootstrap 5 */
-table.dataTable thead th {
-    background-color: #343a40;
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 40px;
+    background: #36304a;
     color: white;
-}
-
-.card {
-    transition: transform 0.2s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.badge {
-    font-size: 0.9em;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
