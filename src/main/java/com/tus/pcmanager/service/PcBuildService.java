@@ -1,7 +1,7 @@
 package com.tus.pcmanager.service;
 
 import com.tus.pcmanager.dto.HardwarePartDTO;
-import com.tus.pcmanager.dto.PcBuildDto;
+import com.tus.pcmanager.dto.PcBuildDTO;
 import com.tus.pcmanager.exception.ResourceNotFoundException;
 import com.tus.pcmanager.model.AppUser;
 import com.tus.pcmanager.model.HardwarePart;
@@ -12,7 +12,6 @@ import com.tus.pcmanager.repository.PcBuildRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,76 +19,86 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PcBuildService {
 
-	private final PcBuildRepository buildRepository;
-	private final HardwarePartRepository partRepository;
-	private final AppUserRepository userRepository;
+    private final PcBuildRepository buildRepository;
+    private final HardwarePartRepository partRepository;
+    private final AppUserRepository userRepository;
 
-	public PcBuild createBuild(String buildName, String username) {
-		AppUser user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+    @Transactional
+    public PcBuildDTO createBuild(String buildName, String username) {
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
-		PcBuild newBuild = new PcBuild();
-		newBuild.setBuildName(buildName);
-		newBuild.setUser(user);
-		newBuild.setCreatedAt(LocalDateTime.now());
+        PcBuild newBuild = new PcBuild();
+        newBuild.setBuildName(buildName);
+        newBuild.setUser(user);
 
-		return buildRepository.save(newBuild);
-	}
+        return mapToDTO(buildRepository.save(newBuild));
+    }
 
-	@Transactional
-	public void addPartToBuild(Long buildId, Long partId) {
-		PcBuild build = buildRepository.findById(buildId)
-				.orElseThrow(() -> new ResourceNotFoundException("Build not found with ID: " + buildId));
+    @Transactional
+    public PcBuildDTO addPartToBuild(Long buildId, Long partId) {
+        PcBuild build = buildRepository.findById(buildId)
+                .orElseThrow(() -> new ResourceNotFoundException("Build not found: " + buildId));
 
-		HardwarePart part = partRepository.findById(partId)
-				.orElseThrow(() -> new ResourceNotFoundException("Hardware Part not found with ID: " + partId));
+        HardwarePart part = partRepository.findById(partId)
+                .orElseThrow(() -> new ResourceNotFoundException("Part not found: " + partId));
 
-		build.getParts().add(part);
+        build.getParts().add(part); 
+        return mapToDTO(buildRepository.save(build));
+    }
 
-		buildRepository.save(build);
-	}
+    @Transactional
+    public PcBuildDTO removePartFromBuild(Long buildId, Long partId) {
+        PcBuild build = buildRepository.findById(buildId)
+                .orElseThrow(() -> new ResourceNotFoundException("Build not found: " + buildId));
 
-	@Transactional
-	public void removePartFromBuild(Long buildId, Long partId) {
-		PcBuild build = buildRepository.findById(buildId)
-				.orElseThrow(() -> new ResourceNotFoundException("Build not found with ID: " + buildId));
+        HardwarePart partToRemove = null;
+        for (HardwarePart p : build.getParts()) {
+            if (p.getId().equals(partId)) {
+                partToRemove = p;
+                break;
+            }
+        }
 
-		HardwarePart partToRemove = partRepository.findById(partId)
-				.orElseThrow(() -> new ResourceNotFoundException("Hardware Part not found with ID: " + partId));
+        if (partToRemove != null) {
+            build.getParts().remove(partToRemove);
+            return mapToDTO(buildRepository.save(build));
+        } else {
+            throw new ResourceNotFoundException("Part not found in this build.");
+        }
+    }
 
-		build.getParts().remove(partToRemove);
-		buildRepository.save(build);
-	}
+    public List<PcBuildDTO> getBuildsForUser(String username) {
+        AppUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
 
-	public List<PcBuildDto> getBuildsForUser(String username) {
-		AppUser user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        List<PcBuild> builds = buildRepository.findByUserId(user.getId());
+        List<PcBuildDTO> dtos = new ArrayList<>();
+        for (PcBuild build : builds) {
+            dtos.add(mapToDTO(build));
+        }
+        return dtos;
+    }
 
-		List<PcBuild> builds = buildRepository.findByUserId(user.getId());
-		List<PcBuildDto> dtos = new ArrayList<>();
+    private PcBuildDTO mapToDTO(PcBuild build) {
+        List<HardwarePartDTO> partDtos = new ArrayList<>();
+        for (HardwarePart part : build.getParts()) {
+            partDtos.add(HardwarePartDTO.builder()
+                    .id(part.getId())
+                    .name(part.getName())
+                    .manufacturer(part.getManufacturer())
+                    .category(part.getCategory())
+                    .price(part.getPrice()) 
+                    .stockLevel(part.getStockLevel())
+                    .build());
+        }
 
-		for (PcBuild build : builds) {
-			PcBuildDto dto = new PcBuildDto();
-			dto.setId(build.getId());
-			dto.setBuildName(build.getBuildName());
-			dto.setCreatedAt(build.getCreatedAt());
-			dto.setTotalPrice(build.getTotalPrice());
-
-			List<HardwarePartDTO> partDtos = new ArrayList<>();
-			for (HardwarePart part : build.getParts()) {
-				HardwarePartDTO partDto = new HardwarePartDTO();
-				partDto.setId(part.getId());
-				partDto.setName(part.getName());
-				partDto.setManufacturer(part.getManufacturer());
-				partDto.setCategory(part.getCategory());
-				partDto.setPrice(part.getPrice());
-				partDto.setStockLevel(part.getStockLevel());
-				partDtos.add(partDto);
-			}
-			dto.setParts(partDtos);
-
-			dtos.add(dto);
-		}
-		return dtos;
-	}
+        return PcBuildDTO.builder()
+                .id(build.getId())
+                .buildName(build.getBuildName())
+                .createdAt(build.getCreatedAt())
+                .totalPrice(build.calculateTotalPrice()) 
+                .parts(partDtos)
+                .build();
+    }
 }

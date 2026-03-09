@@ -1,7 +1,6 @@
 package com.tus.pcmanager.controller;
 
-import com.tus.pcmanager.dto.PcBuildDto;
-import com.tus.pcmanager.model.PcBuild;
+import com.tus.pcmanager.dto.PcBuildDTO;
 import com.tus.pcmanager.service.PcBuildService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,25 +16,22 @@ public class PcBuildController {
     private final PcBuildService buildService;
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<PcBuildDto>> getUserBuilds(@PathVariable String username) {
+    public ResponseEntity<List<PcBuildDTO>> getUserBuilds(@PathVariable String username) {
         return ResponseEntity.ok(buildService.getBuildsForUser(username));
     }
 
     @PostMapping
-    public ResponseEntity<PcBuild> createBuild(@RequestParam String username, @RequestParam String name) {
-        PcBuild newBuild = buildService.createBuild(name, username);
-        return new ResponseEntity<>(newBuild, HttpStatus.CREATED);
+    public ResponseEntity<PcBuildDTO> createBuild(@RequestParam String username, @RequestParam String name) {
+        return new ResponseEntity<>(buildService.createBuild(name, username), HttpStatus.CREATED);
     }
 
     @PostMapping("/{buildId}/parts/{partId}")
-    public ResponseEntity<Void> addPartToBuild(@PathVariable Long buildId, @PathVariable Long partId) {
-        buildService.addPartToBuild(buildId, partId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<PcBuildDTO> addPartToBuild(@PathVariable Long buildId, @PathVariable Long partId) {
+        return ResponseEntity.ok(buildService.addPartToBuild(buildId, partId));
     }
 
     @DeleteMapping("/{buildId}/parts/{partId}")
-    public ResponseEntity<Void> removePartFromBuild(@PathVariable Long buildId, @PathVariable Long partId) {
-        buildService.removePartFromBuild(buildId, partId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<PcBuildDTO> removePartFromBuild(@PathVariable Long buildId, @PathVariable Long partId) {
+        return ResponseEntity.ok(buildService.removePartFromBuild(buildId, partId));
     }
 }
