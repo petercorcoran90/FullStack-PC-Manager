@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,6 +21,13 @@ class LoginUITest {
     private static WebDriver driver;
     private UIHelper ui;
 
+    private static final By USERNAME_INPUT = By.id("username");
+    private static final By PASSWORD_INPUT = By.id("password");
+    private static final By LOGIN_BUTTON = By.id("loginBtn");
+    private static final By LOGOUT_BUTTON = By.id("logoutBtn");
+    private static final By DASHBOARD_VIEW = By.id("dashboardView");
+    private static final By ERROR_MSG = By.id("loginErrorMsg");
+
     @BeforeAll
     static void setUpDriver() {
         driver = SharedDriver.getDriver();
@@ -31,27 +37,29 @@ class LoginUITest {
     void setUp() {
         ui = new UIHelper(driver);
         ui.dismissAlertIfPresent();
-        ui.navigateTo("http://localhost:" + port + "/login.html");
+        ui.navigateTo("http://localhost:" + port + "/");
         ui.clearLocalStorage();
-        driver.navigate().refresh();
+        ui.refreshPage();
     }
 
     @Test
     @Sql({"/testuser.sql"}) 
-    void testSuccessfulLoginRedirectsToDashboard() {
-        ui.typeText(By.id("username"), "sqluser");
-        ui.typeText(By.id("password"), "password");
-        ui.clickElement(By.tagName("button"));
-        assertTrue(ui.isElementVisible(By.id("logoutBtn")));
-        assertTrue(driver.getCurrentUrl().contains("index.html"));
+    void testSuccessfulLoginDisplaysDashboard() {
+        ui.typeText(USERNAME_INPUT, "sqluser");
+        ui.typeText(PASSWORD_INPUT, "password");
+        ui.clickElement(LOGIN_BUTTON);
+        
+        assertTrue(ui.isElementVisible(LOGOUT_BUTTON));
+        assertTrue(ui.isElementVisible(DASHBOARD_VIEW));
     }
 
     @Test
     void testFailedLoginShowsErrorMessage() {
-        ui.typeText(By.id("username"), "wronguser");
-        ui.typeText(By.id("password"), "wrongpass");
-        ui.clickElement(By.tagName("button"));
-        assertTrue(ui.isElementVisible(By.id("errorMsg")));
-        assertEquals("Invalid username or password.", ui.getElementText(By.id("errorMsg")));
+        ui.typeText(USERNAME_INPUT, "wronguser");
+        ui.typeText(PASSWORD_INPUT, "wrongpass");
+        ui.clickElement(LOGIN_BUTTON);
+        
+        assertTrue(ui.isElementVisible(ERROR_MSG));
+        assertTrue(ui.getElementText(ERROR_MSG).contains("Invalid username or password"));
     }
 }

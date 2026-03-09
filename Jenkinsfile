@@ -64,6 +64,14 @@ pipeline {
                 reportFiles: 'index.html',
                 reportName: 'Detailed JaCoCo Report'
             ])
+
+            publishHTML(target: [
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                reportDir: 'target/karate-reports',
+                reportFiles: 'karate-summary.html',
+                reportName: 'Karate API Integration Report'
+            ])
         }
     }
 }
