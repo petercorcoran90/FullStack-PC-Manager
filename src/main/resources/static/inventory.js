@@ -26,14 +26,13 @@ globalThis.loadInventory = function() {
                 dataSrc: '',
                 headers: getAuthHeaders()
             },
-
             dom: '<"wrap-table100"rt><"d-flex justify-content-between mt-4 w-100"<"dt-floating-card d-flex align-items-center gap-3"li><"dt-floating-card d-flex align-items-center gap-3"fp>>',
             language: { search: "", searchPlaceholder: "Search parts..." },
             columns: [
                 { data: 'name' },
                 { data: 'manufacturer' },
                 { data: 'category' },
-                { data: 'price', render: function(data) { return '€' + data.toFixed(2); } },
+                { data: 'price', render: function(data) { return '€' + (data || 0).toFixed(2); } },
                 {
                     data: 'stockLevel', render: function(data) {
                         return data < 5 ? `<span class="badge bg-danger">${data}</span>` : `<span class="badge bg-success">${data}</span>`;
@@ -41,12 +40,20 @@ globalThis.loadInventory = function() {
                 },
                 {
                     data: null,
-                    visible: (userRole === 'ROLE_ADMIN'),
+                    orderable: false,
                     render: function(data) {
-                        return `
-                            <button class="btn btn-warning btn-sm edit-part-btn" data-id="${data.id}"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn btn-danger btn-sm delete-part-btn" data-id="${data.id}"><i class="fa-solid fa-trash"></i></button>
-                        `;
+                        const currentRole = localStorage.getItem('currentUser') === "admin" ? "ROLE_ADMIN" : "ROLE_USER";
+
+                        if (currentRole === 'ROLE_ADMIN') {
+                            return `
+                                <button class="btn btn-warning btn-sm edit-part-btn" data-id="${data.id}"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-danger btn-sm delete-part-btn" data-id="${data.id}"><i class="fa-solid fa-trash"></i></button>
+                            `;
+                        } else {
+                            return `
+                                <button class="btn btn-success btn-sm add-to-build-btn" data-id="${data.id}"><i class="fa-solid fa-plus"></i> Add</button>
+                            `;
+                        }
                     }
                 }
             ]
