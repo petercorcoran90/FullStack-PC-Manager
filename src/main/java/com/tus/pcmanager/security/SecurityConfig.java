@@ -29,7 +29,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/auth.js", "/inventory.js", "/images/**", "/error").permitAll()
+                        .requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/auth.js", "/inventory.js", "/builds.js", "/images/**", "/error").permitAll()
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         .requestMatchers(HttpMethod.GET, API_PARTS_PATTERN).permitAll()
                         .requestMatchers(HttpMethod.POST, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
