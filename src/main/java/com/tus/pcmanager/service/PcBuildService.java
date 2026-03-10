@@ -1,7 +1,7 @@
 package com.tus.pcmanager.service;
 
 import com.tus.pcmanager.dto.HardwarePartDTO;
-import com.tus.pcmanager.dto.PcBuildDto;
+import com.tus.pcmanager.dto.PcBuildDTO;
 import com.tus.pcmanager.exception.ResourceNotFoundException;
 import com.tus.pcmanager.model.AppUser;
 import com.tus.pcmanager.model.HardwarePart;
@@ -61,15 +61,15 @@ public class PcBuildService {
 		buildRepository.save(build);
 	}
 
-	public List<PcBuildDto> getBuildsForUser(String username) {
+	public List<PcBuildDTO> getBuildsForUser(String username) {
 		AppUser user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
 
 		List<PcBuild> builds = buildRepository.findByUserId(user.getId());
-		List<PcBuildDto> dtos = new ArrayList<>();
+		List<PcBuildDTO> dtos = new ArrayList<>();
 
 		for (PcBuild build : builds) {
-			PcBuildDto dto = new PcBuildDto();
+			PcBuildDTO dto = new PcBuildDTO();
 			dto.setId(build.getId());
 			dto.setBuildName(build.getBuildName());
 			dto.setCreatedAt(build.getCreatedAt());

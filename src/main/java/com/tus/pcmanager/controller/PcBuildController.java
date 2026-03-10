@@ -1,6 +1,6 @@
 package com.tus.pcmanager.controller;
 
-import com.tus.pcmanager.dto.PcBuildDto;
+import com.tus.pcmanager.dto.PcBuildDTO;
 import com.tus.pcmanager.model.PcBuild;
 import com.tus.pcmanager.service.PcBuildService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class PcBuildController {
     private final PcBuildService buildService;
 
     @GetMapping("/user/{username}")
-    public ResponseEntity<List<PcBuildDto>> getUserBuilds(@PathVariable String username) {
+    public ResponseEntity<List<PcBuildDTO>> getUserBuilds(@PathVariable String username) {
         return ResponseEntity.ok(buildService.getBuildsForUser(username));
     }
 
