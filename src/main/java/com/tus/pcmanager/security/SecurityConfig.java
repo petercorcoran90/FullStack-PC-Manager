@@ -19,35 +19,37 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthFilter jwtAuthFilter;
-    
-    private static final String API_PARTS_PATTERN = "/api/parts/**";
-    private static final String ADMIN_ROLE = "ADMIN";
+	private final JwtAuthFilter jwtAuthFilter;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/auth.js", "/inventory.js", "/builds.js", "/images/**", "/error").permitAll()
-                        .requestMatchers("/api/users/register", "/api/users/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, API_PARTS_PATTERN).permitAll()
-                        .requestMatchers(HttpMethod.POST, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.PUT, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
-                        .requestMatchers(HttpMethod.DELETE, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+	private static final String API_PARTS_PATTERN = "/api/parts/**";
+	private static final String ADMIN_ROLE = "ADMIN";
 
-        return http.build();
-    }
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/", "/index.html", "/styles.css", "/app.js", "/auth.js", "/inventory.js",
+								"/builds.js", "/images/**", "/error")
+						.permitAll().requestMatchers("/api/users/register", "/api/users/login").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/analytics/**").hasRole(ADMIN_ROLE)
+						.requestMatchers(HttpMethod.GET, API_PARTS_PATTERN).permitAll()
+						.requestMatchers(HttpMethod.POST, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
+						.requestMatchers(HttpMethod.PUT, API_PARTS_PATTERN).hasRole(ADMIN_ROLE)
+						.requestMatchers(HttpMethod.DELETE, API_PARTS_PATTERN).hasRole(ADMIN_ROLE).anyRequest()
+						.authenticated())
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+		return http.build();
+	}
 
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
 }

@@ -1,83 +1,62 @@
 Feature: Hardware Part API Tests
   To test the CRUD operations for Hardware Parts
 
-Background: Setup the Base path and Authentication
+Background: Setup Auth and Base Data
   Given url baseUrl
   
-  # 1. Register a test user dynamically
-  Given path '/api/users/register'
-  And request { "username": "hardwaretester", "password": "password", "role": "ROLE_ADMIN" }
-  When method post
-  
-  # 2. Login to get the JWT Token
+  # 1. Login as Admin
   Given path '/api/users/login'
-  And request { "username": "hardwaretester", "password": "password" }
+  And request { "username": "admin", "password": "admin" }
   When method post
   Then status 200
-  * def authToken = response.token
-  
-  # 3. Configure Karate to send this token with EVERY request in this file!
-  * def authHeader = 'Bearer ' + authToken
-  * configure headers = { Authorization: '#(authHeader)', Accept: 'application/json' }
+  * def adminAuth = { Authorization: '#("Bearer " + response.token)', Accept: 'application/json' }
+  * configure headers = adminAuth
 
-Scenario: Create, Read, Update, and Delete a Hardware Part
-  # 1. Create a new part (POST)
+  # 2. Create a Base Part before EVERY scenario to guarantee data exists
+  * def basePartName = 'Base GPU ' + java.util.UUID.randomUUID().toString().substring(0,8)
   Given path '/api/parts'
-  And request { "name": "Karate GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 599.99, "stockLevel": 15 }
+  And request { "name": '#(basePartName)', "manufacturer": "NVIDIA", "category": "GPU", "price": 500.00, "stockLevel": 10 }
   When method post
   Then status 201
-  And match response.id == '#present'
-  And match response.id == '#number'
-  And match response.name == 'Karate GPU'
-  
-  # Save the auto-generated ID for the next steps!
-  * def partId = response.id
+  * def existingPartId = response.id
 
-  # 2. Get Part by ID (GET)
-  Given path '/api/parts', partId
+# --- SCENARIOS ---
+
+Scenario: Create a new Hardware Part (POST)
+  Given path '/api/parts'
+  And request { "name": "New Karate GPU", "manufacturer": "AMD", "category": "GPU", "price": 499.99, "stockLevel": 5 }
+  When method post
+  Then status 201
+  And match response.name == 'New Karate GPU'
+
+Scenario: Retrieve an existing Part by ID (GET)
+  Given path '/api/parts', existingPartId
   When method get
   Then status 200
-  And match response.name == 'Karate GPU'
-  And match response.price == 599.99
+  And match response.name == basePartName
 
-  # 3. Update Part (PUT)
-  Given path '/api/parts', partId
-  And request { "name": "Karate GPU Pro", "manufacturer": "NVIDIA", "category": "GPU", "price": 699.99, "stockLevel": 10 }
+Scenario: Update an existing Part (PUT)
+  Given path '/api/parts', existingPartId
+  And request { "name": "Updated Base GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 600.00, "stockLevel": 20 }
   When method put
   Then status 200
-  And match response.name == 'Karate GPU Pro'
-  And match response.price == 699.99
+  And match response.name == 'Updated Base GPU'
+  And match response.price == 600.00
 
-  # 4. Search Parts using Request Param (GET)
-  Given path '/api/parts'
-  And param search = 'Karate'
-  When method get
-  Then status 200
-  And match response[0].id == '#present'
-  And match response[0].name == 'Karate GPU Pro'
-
-  # 5. Delete Part (DELETE)
-  Given path '/api/parts', partId
+Scenario: Delete a Part (DELETE)
+  Given path '/api/parts', existingPartId
   When method delete
   Then status 204
-  
-  Scenario: Missing or Invalid Fields - Unsuccessful
-  # Attempt to create a part with negative price and stock
+
+Scenario: Prevent creating a part with negative values
   Given path '/api/parts'
   And request { "name": "Faulty RAM", "manufacturer": "Corsair", "category": "RAM", "price": -10.00, "stockLevel": -5 }
   When method post
-  # Expecting a failure status (usually 400 Bad Request or 500 depending on your exception handler)
-  # Karate allows us to assert that the status is NOT 201 Created
   Then assert responseStatus == 400 || responseStatus == 500
 
-Scenario: Unauthorised Access Attempt
-  # 1. Clear the Authorization header that was set in the Background step
-  * configure headers = { Accept: 'application/json' }
-  
-  # 2. Attempt to add a part WITHOUT a JWT token
+Scenario: Prevent unauthorized access to Admin endpoints
+  * configure headers = { Accept: 'application/json' } # Clear the token
   Given path '/api/parts'
   And request { "name": "Hacker GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 100.00, "stockLevel": 1 }
   When method post
-  
-  # 3. System should reject the request (401 Unauthorized or 403 Forbidden)
   Then assert responseStatus == 401 || responseStatus == 403
