@@ -138,4 +138,19 @@ class PcBuildServiceTest {
 		assertEquals("Part not found in this build.", ex.getMessage());
 		verify(buildRepository, never()).save(any(PcBuild.class));
 	}
+	
+	@Test
+	void deleteBuildSuccess() {
+		when(buildRepository.existsById(1L)).thenReturn(true);
+		pcBuildService.deleteBuild(1L);
+		verify(buildRepository, times(1)).deleteById(1L);
+	}
+
+	@Test
+	void deleteBuildNotFoundThrowsException() {
+		when(buildRepository.existsById(99L)).thenReturn(false);
+		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, 
+				() -> pcBuildService.deleteBuild(99L));
+		assertEquals("Build not found: 99", ex.getMessage());
+	}
 }

@@ -36,6 +36,10 @@ class PcBuildUITest {
     private static final By ADD_TO_BUILD_BTN = By.cssSelector(".add-to-build-btn");
     private static final By REMOVE_PART_BTN = By.cssSelector(".remove-part-btn");
     private static final By QUANTITY_BADGE = By.cssSelector("#detailPartsList .badge");
+    private static final By NAV_MY_BUILDS_BTN = By.id("navMyBuildsBtn");
+    private static final By DELETE_BUILD_BTN = By.cssSelector(".delete-build-btn");
+    private static final By DELETE_BUILD_MODAL = By.id("deleteBuildConfirmModal");
+    private static final By CONFIRM_DELETE_BUILD_BTN = By.id("confirmDeleteBuildBtn");
 
     @BeforeAll
     static void setUpDriver() {
@@ -93,5 +97,25 @@ class PcBuildUITest {
         ui.waitForInvisibility(QUANTITY_BADGE);
         String totalAfterRemove = ui.getElementText(DETAIL_BUILD_TOTAL);
         assertEquals(totalAfterFirstAdd, totalAfterRemove);
+    }
+    
+    @Test
+    void testDeleteBuildProfileUsingModal() {
+        String buildToDelete = "Trash PC " + UUID.randomUUID().toString().substring(0, 4);
+        ui.clickElement(OPEN_CREATE_BUILD_BTN);
+        ui.waitForVisibility(CREATE_BUILD_MODAL);
+        ui.typeText(NEW_BUILD_NAME_INPUT, buildToDelete);
+        ui.clickElement(SAVE_BUILD_BTN);
+        ui.waitForVisibility(BUILD_DETAILS_SECTION);
+        ui.clickElement(NAV_MY_BUILDS_BTN);
+        ui.waitForVisibility(USER_BUILDS_SECTION);
+        ui.clickElement(DELETE_BUILD_BTN);
+        ui.waitForVisibility(DELETE_BUILD_MODAL);
+        ui.clickElement(CONFIRM_DELETE_BUILD_BTN);
+        ui.waitForInvisibility(DELETE_BUILD_MODAL);
+        By tableBody = By.id("buildsTableBody");
+        ui.waitForTextToDisappear(tableBody, buildToDelete);
+        String tableText = ui.getElementText(tableBody);
+        assertFalse(tableText.contains(buildToDelete));
     }
 }

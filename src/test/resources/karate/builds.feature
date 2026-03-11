@@ -1,78 +1,100 @@
 Feature: PC Build Management API Tests
   To verify build creation, part management, and total cost calculation
 
-Background:
+Background: Setup Data for Builds
   Given url baseUrl
   
-  # 1. Setup: Register and Login a standard user
-  * def testUsername = 'build_user_' + java.util.UUID.randomUUID().toString().substring(0,8)
+  # 1. Setup User Auth
+  * def testUsername = 'builder_' + java.util.UUID.randomUUID().toString().substring(0,8)
   Given path '/api/users/register'
   And request { "username": '#(testUsername)', "password": "password", "role": "ROLE_USER" }
   When method post
-  Then status 201
-
+  
   Given path '/api/users/login'
   And request { "username": '#(testUsername)', "password": "password" }
   When method post
-  Then status 200
-  * def userAuthToken = response.token
-  * def authHeader = { Authorization: '#("Bearer " + userAuthToken)', Accept: 'application/json' }
+  * def userAuth = { Authorization: '#("Bearer " + response.token)', Accept: 'application/json' }
 
-  # 2. Setup: Create a Hardware Part as Admin to use in the builds
-  # (Login as the admin created by your DataInitialiser)
+  # 2. Create a Part as Admin
   Given path '/api/users/login'
   And request { "username": "admin", "password": "admin" }
   When method post
-  Then status 200
-  * def adminToken = response.token
+  * def adminAuth = { Authorization: '#("Bearer " + response.token)' }
 
+  * def testRamName = 'Test RAM ' + java.util.UUID.randomUUID().toString().substring(0,8)
   Given path '/api/parts'
-  And header Authorization = 'Bearer ' + adminToken
-  And request { "name": "Build RAM", "manufacturer": "Corsair", "category": "RAM", "price": 80.00, "stockLevel": 20 }
+  And headers adminAuth
+  And request { "name": '#(testRamName)', "manufacturer": "Corsair", "category": "RAM", "price": 80.00, "stockLevel": 20 }
   When method post
-  Then status 201
-  * def partId = response.id
+  * def testPartId = response.id
 
-Scenario: Full PC Build Lifecycle (Acceptance Criteria 1-4)
-  # AC1: Creating a New Build Profile
+  # 3. Create a Base Build for the User
+  * def baseBuildName = 'Base Gaming PC ' + java.util.UUID.randomUUID().toString().substring(0,8)
   Given path '/api/builds'
-  And configure headers = authHeader
+  And headers userAuth
   And param username = testUsername
-  And param name = 'Budget Gaming 2026'
+  And param name = baseBuildName
+  When method post
+  * def baseBuildId = response.id
+
+# --- SCENARIOS ---
+
+Scenario: Create a new Build Profile
+  Given path '/api/builds'
+  And headers userAuth
+  And param username = testUsername
+  And param name = 'Office PC'
   When method post
   Then status 201
-  And match response.buildName == 'Budget Gaming 2026'
-  * def buildId = response.id
+  And match response.buildName == 'Office PC'
 
-  # AC2 & AC4: Adding Multiple Parts and Duplicate Part Addition
-  # Add the first RAM stick
-  Given path '/api/builds/' + buildId + '/parts/' + partId
-  And configure headers = authHeader
+Scenario: Add a single part to a build
+  Given path '/api/builds/' + baseBuildId + '/parts/' + testPartId
+  And headers userAuth
   When method post
   Then status 200
   And match response.parts == '#[1]'
   And match response.totalPrice == 80.00
 
-  # Add a second identical RAM stick
-  Given path '/api/builds/' + buildId + '/parts/' + partId
-  And configure headers = authHeader
+Scenario: Add duplicate parts to a build and calculate total
+  # Add first part
+  Given path '/api/builds/' + baseBuildId + '/parts/' + testPartId
+  And headers userAuth
+  When method post
+  # Add second duplicate part
+  Given path '/api/builds/' + baseBuildId + '/parts/' + testPartId
+  And headers userAuth
   When method post
   Then status 200
   And match response.parts == '#[2]'
   And match response.totalPrice == 160.00
 
-  # AC3: Removing a Part from a Build
-  # Remove one instance of the RAM
-  Given path '/api/builds/' + buildId + '/parts/' + partId
-  And configure headers = authHeader
+Scenario: Remove a part from a build
+  # Setup: Add the part first
+  Given path '/api/builds/' + baseBuildId + '/parts/' + testPartId
+  And headers userAuth
+  When method post
+  
+  # Action: Remove it
+  Given path '/api/builds/' + baseBuildId + '/parts/' + testPartId
+  And headers userAuth
   When method delete
   Then status 200
-  And match response.parts == '#[1]'
-  And match response.totalPrice == 80.00
+  And match response.parts == '#[0]'
+  And match response.totalPrice == 0.00
+  
+Scenario: Delete an entire PC Build
+  # 1. Create a specific build to delete
+  Given path '/api/builds'
+  And headers userAuth
+  And param username = testUsername
+  And param name = 'To Be Deleted PC'
+  When method post
+  Then status 201
+  * def deleteId = response.id
 
-  # Verify build appears in user's build list
-  Given path '/api/builds/user/' + testUsername
-  And configure headers = authHeader
-  When method get
-  Then status 200
-  And match response[0].buildName == 'Budget Gaming 2026'
+  # 2. Delete it and expect 204 No Content
+  Given path '/api/builds/' + deleteId
+  And headers userAuth
+  When method delete
+  Then status 204

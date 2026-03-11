@@ -1,5 +1,5 @@
 let activeBuildId = null;
-
+let buildToDeleteId = null;
 globalThis.loadBuildsList = function() {
     $('#userBuildsSection').removeClass('d-none');
     $('#buildDetailsSection, #inventorySection').addClass('d-none');
@@ -33,17 +33,20 @@ globalThis.loadBuildsList = function() {
                 const total = b.totalPrice || 0;
 
                 tbody.append(`
-                    <tr>
-                        <td class="fw-bold" style="color: #4d4d4d;">${b.buildName}</td>
-                        <td>${dateStr}</td>
-                        <td class="fw-bold">€${total.toFixed(2)}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-primary view-build-btn" data-id="${b.id}">
-                                <i class="fa-solid fa-pen-to-square"></i> Edit Components
-                            </button>
-                        </td>
-                    </tr>
-                `);
+				                    <tr>
+				                        <td class="fw-bold" style="color: #4d4d4d;">${b.buildName}</td>
+				                        <td>${dateStr}</td>
+				                        <td class="fw-bold">€${total.toFixed(2)}</td>
+				                        <td class="text-center">
+				                            <button class="btn btn-warning btn-sm view-build-btn" data-id="${b.id}">
+				                                <i class="fa-solid fa-pen"></i>
+				                            </button>
+				                            <button class="btn btn-danger btn-sm delete-build-btn" data-id="${b.id}">
+				                                <i class="fa-solid fa-trash"></i>
+				                            </button>
+				                        </td>
+				                    </tr>
+				                `);
             });
         },
         error: function(err) {
@@ -52,13 +55,11 @@ globalThis.loadBuildsList = function() {
     });
 };
 
-// 2. Open the Specific Build Details View
 globalThis.openBuildDetails = function(buildId) {
     activeBuildId = buildId;
     $('#userBuildsSection').addClass('d-none');
     $('#buildDetailsSection, #inventorySection').removeClass('d-none');
 
-    // FIX: DataTables initialized while hidden squishes the columns. We must force an adjust here!
     if ($.fn.DataTable.isDataTable('#partsTable')) {
         $('#partsTable').DataTable().columns.adjust().draw();
     }
@@ -92,7 +93,6 @@ function renderActiveBuild(build) {
         return;
     }
 
-    // US4 AC4: Group Duplicate Parts together for a clean UI
     const groupedParts = {};
     build.parts.forEach(p => {
         if (groupedParts[p.id]) {
@@ -126,7 +126,6 @@ function renderActiveBuild(build) {
 
 $(document).ready(function() {
 
-    // UI Navigation
     $('#navMyBuildsBtn').click(function() {
         globalThis.loadBuildsList();
     });
@@ -135,7 +134,6 @@ $(document).ready(function() {
         openBuildDetails($(this).data('id'));
     });
 
-    // Create Build
     $('#openCreateBuildBtn').click(function() {
         $('#newBuildName').val('');
         $('#createBuildModal').modal('show');
@@ -159,7 +157,6 @@ $(document).ready(function() {
         });
     });
 
-    // Add Part to Build 
     $(document).on('click', '.add-to-build-btn', function() {
         if (!activeBuildId) return;
 
@@ -179,7 +176,6 @@ $(document).ready(function() {
         });
     });
 
-    // Remove Part from Build
     $(document).on('click', '.remove-part-btn', function() {
         const partId = $(this).data('id');
         const btn = $(this);
@@ -191,6 +187,35 @@ $(document).ready(function() {
             headers: getAuthHeaders(),
             success: function(updatedBuild) {
                 renderActiveBuild(updatedBuild);
+            }
+        });
+    });
+
+    $(document).on('click', '.delete-build-btn', function(e) {
+        e.stopPropagation();
+        buildToDeleteId = $(this).data('id');
+        $('#deleteBuildConfirmModal').modal('show');
+    });
+
+    $(document).on('click', '#confirmDeleteBuildBtn', function() {
+        if (!buildToDeleteId) return;
+
+        const modalBtn = $(this);
+        modalBtn.prop('disabled', true).html('<i class="fa-solid fa-spinner fa-spin"></i>');
+
+        $.ajax({
+            url: `/api/builds/${buildToDeleteId}`,
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+            success: function() {
+                $('#deleteBuildConfirmModal').modal('hide');
+                modalBtn.prop('disabled', false).text('Delete');
+                buildToDeleteId = null;
+                globalThis.loadBuildsList();
+            },
+            error: function() {
+                alert("Failed to delete the build. Please try again.");
+                modalBtn.prop('disabled', false).text('Delete');
             }
         });
     });
