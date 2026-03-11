@@ -35,6 +35,8 @@ class AnalyticsUITest {
     private static final By PART_PRICE_INPUT = By.id("partPrice");
     private static final By PART_STOCK_INPUT = By.id("partStock");
     private static final By SAVE_PART_BTN = By.id("savePartBtn");
+    private static final By SUCCESS_MODAL = By.id("successModal");
+    private static final By SUCCESS_MODAL_OK_BTN = By.cssSelector("#successModal button[data-bs-dismiss='modal']");
 
     @BeforeAll
     static void setUpDriver() {
@@ -63,6 +65,9 @@ class AnalyticsUITest {
         ui.typeText(PART_PRICE_INPUT, "500");
         ui.typeText(PART_STOCK_INPUT, "10");
         ui.clickElement(SAVE_PART_BTN);
+        ui.waitForVisibility(SUCCESS_MODAL);
+        ui.clickElement(SUCCESS_MODAL_OK_BTN);
+        ui.waitForInvisibility(SUCCESS_MODAL);
         ui.waitForInvisibility(PART_MODAL);
         ui.waitForVisibility(NAV_ANALYTICS_BTN);
         ui.clickElement(NAV_ANALYTICS_BTN);

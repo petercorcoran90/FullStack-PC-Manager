@@ -42,6 +42,9 @@ class HardwarePartUITest {
     private static final By SEARCH_INPUT = By.cssSelector("input[type='search']");
     private static final By DELETE_CONFIRM_MODAL = By.id("deleteConfirmModal");
     private static final By CONFIRM_DELETE_BTN = By.id("confirmDeleteBtn");
+    private static final By SUCCESS_MODAL = By.id("successModal");
+    private static final By SUCCESS_MODAL_MSG = By.id("successModalMessage");
+    private static final By SUCCESS_MODAL_OK_BTN = By.cssSelector("#successModal button[data-bs-dismiss='modal']");
 
     @BeforeAll
     static void setUpDriver() {
@@ -68,6 +71,10 @@ class HardwarePartUITest {
         return By.xpath("//td[contains(text(), '" + uniqueName + "')]/following-sibling::td//button[contains(@class, 'delete-part-btn')]");
     }
 
+    private By getEditButtonForPart(String uniqueName) {
+        return By.xpath("//td[contains(text(), '" + uniqueName + "')]/following-sibling::td//button[contains(@class, 'edit-part-btn')]");
+    }
+
     private void addHardwarePart(String name, String price, String stock) {
         ui.clickElement(ADD_PART_BTN);
         ui.waitForVisibility(PART_MODAL);
@@ -83,10 +90,38 @@ class HardwarePartUITest {
     void testSuccessfulPartAddition() {
         String uniqueName = "Test CPU " + UUID.randomUUID().toString().substring(0, 6);
         addHardwarePart(uniqueName, "299.99", "10");
+        ui.waitForVisibility(SUCCESS_MODAL);
+        assertTrue(ui.getElementText(SUCCESS_MODAL_MSG).contains("Part added successfully."));
+        ui.clickElement(SUCCESS_MODAL_OK_BTN);
+        ui.waitForInvisibility(SUCCESS_MODAL);
         ui.waitForInvisibility(PART_MODAL);
         ui.typeText(SEARCH_INPUT, uniqueName);
         ui.waitForTextToAppear(PARTS_TABLE, uniqueName);
         assertTrue(ui.getElementText(PARTS_TABLE).contains(uniqueName));
+    }
+
+    @Test
+    void testSuccessfulPartUpdate() {
+        String initialName = "Old GPU " + UUID.randomUUID().toString().substring(0, 6);
+        addHardwarePart(initialName, "400.00", "5");
+        ui.waitForVisibility(SUCCESS_MODAL);
+        ui.clickElement(SUCCESS_MODAL_OK_BTN);
+        ui.waitForInvisibility(SUCCESS_MODAL);
+        ui.typeText(SEARCH_INPUT, initialName);
+        ui.waitForTextToAppear(PARTS_TABLE, initialName);
+        ui.clickElement(getEditButtonForPart(initialName));
+        ui.waitForVisibility(PART_MODAL);
+        String updatedName = "Updated GPU " + UUID.randomUUID().toString().substring(0, 6);
+        ui.typeText(PART_NAME_INPUT, updatedName); 
+        ui.typeText(PART_PRICE_INPUT, "450.00");
+        ui.clickElement(SAVE_PART_BTN);
+        ui.waitForVisibility(SUCCESS_MODAL);
+        assertTrue(ui.getElementText(SUCCESS_MODAL_MSG).contains("Part updated successfully."));
+        ui.clickElement(SUCCESS_MODAL_OK_BTN);
+        ui.waitForInvisibility(SUCCESS_MODAL);
+        ui.typeText(SEARCH_INPUT, updatedName);
+        ui.waitForTextToAppear(PARTS_TABLE, updatedName);
+        assertTrue(ui.getElementText(PARTS_TABLE).contains(updatedName));
     }
 
     @Test
@@ -103,6 +138,9 @@ class HardwarePartUITest {
     void testPartDeletion() {
         String uniqueName = "Delete Me " + UUID.randomUUID().toString().substring(0, 6);
         addHardwarePart(uniqueName, "199.99", "5");
+        ui.waitForVisibility(SUCCESS_MODAL);
+        ui.clickElement(SUCCESS_MODAL_OK_BTN);
+        ui.waitForInvisibility(SUCCESS_MODAL);
         ui.waitForInvisibility(PART_MODAL);
         ui.typeText(SEARCH_INPUT, uniqueName);
         ui.waitForTextToAppear(PARTS_TABLE, uniqueName);
