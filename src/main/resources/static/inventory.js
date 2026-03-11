@@ -110,7 +110,12 @@ $(document).ready(function() {
             success: function() {
                 $('#partModal').modal('hide');
                 $('#modalErrorAlert').addClass('d-none');
+
                 partsTable.ajax.reload();
+
+                const successText = id ? "Part updated successfully." : "Part added successfully.";
+                $('#successModalMessage').text(successText);
+                $('#successModal').modal('show');
             },
             error: function(xhr) {
                 const errorMsg = xhr.responseJSON?.message || "Invalid input detected.";

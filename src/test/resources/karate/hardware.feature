@@ -30,21 +30,13 @@ Scenario: Create a new Hardware Part (POST)
   And match response.name == 'New Karate GPU'
 
 Scenario: Retrieve an existing Part by ID (GET)
-  Given path '/api/parts', existingPartId
+  Given path '/api/parts/' + existingPartId
   When method get
   Then status 200
   And match response.name == basePartName
 
-Scenario: Update an existing Part (PUT)
-  Given path '/api/parts', existingPartId
-  And request { "name": "Updated Base GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 600.00, "stockLevel": 20 }
-  When method put
-  Then status 200
-  And match response.name == 'Updated Base GPU'
-  And match response.price == 600.00
-
 Scenario: Delete a Part (DELETE)
-  Given path '/api/parts', existingPartId
+  Given path '/api/parts/' + existingPartId
   When method delete
   Then status 204
 
@@ -52,7 +44,8 @@ Scenario: Prevent creating a part with negative values
   Given path '/api/parts'
   And request { "name": "Faulty RAM", "manufacturer": "Corsair", "category": "RAM", "price": -10.00, "stockLevel": -5 }
   When method post
-  Then assert responseStatus == 400 || responseStatus == 500
+  Then status 400
+  And match response.message == 'Price must be greater than zero.'
 
 Scenario: Prevent unauthorized access to Admin endpoints
   * configure headers = { Accept: 'application/json' } # Clear the token
@@ -60,3 +53,22 @@ Scenario: Prevent unauthorized access to Admin endpoints
   And request { "name": "Hacker GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 100.00, "stockLevel": 1 }
   When method post
   Then assert responseStatus == 401 || responseStatus == 403
+
+Scenario: US6 AC1 - Successfully update an existing part
+  # 1. Update the base part with new values
+  Given path '/api/parts/' + existingPartId
+  And request { "name": "Updated Base GPU", "manufacturer": "NVIDIA", "category": "GPU", "price": 600.00, "stockLevel": 20 }
+  When method put
+  Then status 200
+  And match response.name == 'Updated Base GPU'
+  And match response.price == 600.00
+
+Scenario: US6 AC2 - Prevent updating a part with a negative price
+  # 1. Try to update the base part with a negative price
+  Given path '/api/parts/' + existingPartId
+  And request { "name": "Valid Name", "manufacturer": "AMD", "category": "GPU", "price": -50.00, "stockLevel": 10 }
+  When method put
+  
+  # 2. Assert the GlobalExceptionHandler catches it and returns 400 Bad Request
+  Then status 400
+  And match response.message == 'Price must be greater than zero.'

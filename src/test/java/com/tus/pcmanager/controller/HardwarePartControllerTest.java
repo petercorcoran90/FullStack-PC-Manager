@@ -2,9 +2,7 @@ package com.tus.pcmanager.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import com.tus.pcmanager.dto.HardwarePartDTO;
-import com.tus.pcmanager.model.HardwarePart;
 import com.tus.pcmanager.service.HardwarePartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,9 @@ class HardwarePartControllerTest {
 		HardwarePartDTO part2 = new HardwarePartDTO(2L, "CPU", "Intel", "Processor", new BigDecimal("300"), 5);
 		List<HardwarePartDTO> expectedParts = Arrays.asList(part1, part2);
 		when(hardwarePartService.getAllParts()).thenReturn(expectedParts);
+		
 		ResponseEntity<List<HardwarePartDTO>> response = hardwarePartController.getAllParts(null);
+		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(2, response.getBody().size());
 		verify(hardwarePartService, times(1)).getAllParts();
@@ -43,7 +43,9 @@ class HardwarePartControllerTest {
 		HardwarePartDTO part1 = new HardwarePartDTO(1L, "GPU", "NVIDIA", "Graphics", new BigDecimal("500"), 2);
 		List<HardwarePartDTO> expectedParts = Arrays.asList(part1);
 		when(hardwarePartService.searchParts("NVIDIA")).thenReturn(expectedParts);
+		
 		ResponseEntity<List<HardwarePartDTO>> response = hardwarePartController.getAllParts("NVIDIA");
+		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(1, response.getBody().size());
 		assertEquals("NVIDIA", response.getBody().get(0).getManufacturer());
@@ -53,9 +55,11 @@ class HardwarePartControllerTest {
 
 	@Test
 	void getPartByIdReturnsOkAndPart() {
-		HardwarePart mockPart = new HardwarePart(1L, "RAM", "Corsair", "Memory", new BigDecimal("100"), 4);
+		HardwarePartDTO mockPart = new HardwarePartDTO(1L, "RAM", "Corsair", "Memory", new BigDecimal("100"), 4);
 		when(hardwarePartService.getPartById(1L)).thenReturn(mockPart);
-		ResponseEntity<HardwarePart> response = hardwarePartController.getPartById(1L);
+		
+		ResponseEntity<HardwarePartDTO> response = hardwarePartController.getPartById(1L);
+		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals("RAM", response.getBody().getName());
@@ -64,10 +68,12 @@ class HardwarePartControllerTest {
 
 	@Test
 	void addPartReturnsCreatedAndPart() {
-		HardwarePart newPart = new HardwarePart(null, "Motherboard", "ASUS", "Board", new BigDecimal("250"), 3);
-		HardwarePart savedPart = new HardwarePart(1L, "Motherboard", "ASUS", "Board", new BigDecimal("250"), 3);
+		HardwarePartDTO newPart = new HardwarePartDTO(null, "Motherboard", "ASUS", "Board", new BigDecimal("250"), 3);
+		HardwarePartDTO savedPart = new HardwarePartDTO(1L, "Motherboard", "ASUS", "Board", new BigDecimal("250"), 3);
 		when(hardwarePartService.addPart(newPart)).thenReturn(savedPart);
-		ResponseEntity<HardwarePart> response = hardwarePartController.addPart(newPart);
+		
+		ResponseEntity<HardwarePartDTO> response = hardwarePartController.addPart(newPart);
+		
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals(1L, response.getBody().getId());
@@ -76,12 +82,12 @@ class HardwarePartControllerTest {
 
 	@Test
 	void updatePartReturnsOkAndUpdatedPart() {
-		HardwarePart updateDetails = new HardwarePart(null, "Updated Motherboard", "ASUS", "Board",
-				new BigDecimal("260"), 5);
-		HardwarePart updatedPart = new HardwarePart(1L, "Updated Motherboard", "ASUS", "Board", new BigDecimal("260"),
-				5);
+		HardwarePartDTO updateDetails = new HardwarePartDTO(null, "Updated Motherboard", "ASUS", "Board", new BigDecimal("260"), 5);
+		HardwarePartDTO updatedPart = new HardwarePartDTO(1L, "Updated Motherboard", "ASUS", "Board", new BigDecimal("260"), 5);
 		when(hardwarePartService.updatePart(1L, updateDetails)).thenReturn(updatedPart);
-		ResponseEntity<HardwarePart> response = hardwarePartController.updatePart(1L, updateDetails);
+		
+		ResponseEntity<HardwarePartDTO> response = hardwarePartController.updatePart(1L, updateDetails);
+		
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertNotNull(response.getBody());
 		assertEquals("Updated Motherboard", response.getBody().getName());

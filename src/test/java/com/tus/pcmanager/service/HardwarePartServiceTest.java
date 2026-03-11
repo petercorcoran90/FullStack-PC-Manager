@@ -2,10 +2,8 @@ package com.tus.pcmanager.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 import com.tus.pcmanager.dto.HardwarePartDTO;
 import com.tus.pcmanager.exception.DuplicateResourceException;
-import com.tus.pcmanager.exception.InvalidResourceException;
 import com.tus.pcmanager.exception.ResourceNotFoundException;
 import com.tus.pcmanager.model.HardwarePart;
 import com.tus.pcmanager.repository.HardwarePartRepository;
@@ -29,21 +27,21 @@ class HardwarePartServiceTest {
 
 	@Test
 	void addPartSuccess() {
-		HardwarePart newPart = new HardwarePart(null, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
-		HardwarePart savedPart = new HardwarePart(1L, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
+		HardwarePartDTO newPartDto = new HardwarePartDTO(null, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
+		HardwarePart savedPartEntity = new HardwarePart(1L, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
 		when(hardwarePartRepository.existsByNameIgnoreCase("Core i9")).thenReturn(false);
-		when(hardwarePartRepository.save(any(HardwarePart.class))).thenReturn(savedPart);
-		HardwarePart result = hardwarePartService.addPart(newPart);
+		when(hardwarePartRepository.save(any(HardwarePart.class))).thenReturn(savedPartEntity);
+		HardwarePartDTO result = hardwarePartService.addPart(newPartDto);
 		assertNotNull(result);
 		assertEquals(1L, result.getId());
 		assertEquals("Core i9", result.getName());
 		verify(hardwarePartRepository, times(1)).existsByNameIgnoreCase("Core i9");
-		verify(hardwarePartRepository, times(1)).save(newPart);
+		verify(hardwarePartRepository, times(1)).save(any(HardwarePart.class));
 	}
 
 	@Test
 	void addPartDuplicateThrowsException() {
-		HardwarePart duplicatePart = new HardwarePart(null, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
+		HardwarePartDTO duplicatePart = new HardwarePartDTO(null, "Core i9", "Intel", "CPU", new BigDecimal("500.00"), 10);
 		when(hardwarePartRepository.existsByNameIgnoreCase("Core i9")).thenReturn(true);
 		DuplicateResourceException ex = assertThrows(DuplicateResourceException.class,
 				() -> hardwarePartService.addPart(duplicatePart));
@@ -52,30 +50,10 @@ class HardwarePartServiceTest {
 	}
 
 	@Test
-	void addPartNegativePriceThrowsException() {
-		HardwarePart invalidPart = new HardwarePart(null, "Cheap CPU", "AMD", "CPU", new BigDecimal("-10.00"), 5);
-		when(hardwarePartRepository.existsByNameIgnoreCase("Cheap CPU")).thenReturn(false);
-		InvalidResourceException ex = assertThrows(InvalidResourceException.class,
-				() -> hardwarePartService.addPart(invalidPart));
-		assertEquals("Price cannot be negative or null.", ex.getMessage());
-		verify(hardwarePartRepository, never()).save(any(HardwarePart.class));
-	}
-
-	@Test
-	void addPartNegativeStockThrowsException() {
-		HardwarePart invalidPart = new HardwarePart(null, "Rare RAM", "Corsair", "RAM", new BigDecimal("100.00"), -5);
-		when(hardwarePartRepository.existsByNameIgnoreCase("Rare RAM")).thenReturn(false);
-		InvalidResourceException ex = assertThrows(InvalidResourceException.class,
-				() -> hardwarePartService.addPart(invalidPart));
-		assertEquals("Stock level cannot be negative or null.", ex.getMessage());
-		verify(hardwarePartRepository, never()).save(any(HardwarePart.class));
-	}
-
-	@Test
 	void getPartByIdSuccess() {
 		HardwarePart mockPart = new HardwarePart(1L, "RTX 4090", "NVIDIA", "GPU", new BigDecimal("1500.00"), 2);
 		when(hardwarePartRepository.findById(1L)).thenReturn(Optional.of(mockPart));
-		HardwarePart result = hardwarePartService.getPartById(1L);
+		HardwarePartDTO result = hardwarePartService.getPartById(1L);
 		assertNotNull(result);
 		assertEquals("RTX 4090", result.getName());
 		verify(hardwarePartRepository, times(1)).findById(1L);
@@ -83,7 +61,7 @@ class HardwarePartServiceTest {
 
 	@Test
 	void getPartByIdNotFoundThrowsException() {
-		when(hardwarePartRepository.findById(99L)).thenReturn(Optional.empty());
+		when(hardwarePartRepository.findById(99L)).thenReturn(Optional.empty());	
 		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
 				() -> hardwarePartService.getPartById(99L));
 		assertEquals("Hardware Part not found with ID: 99", ex.getMessage());
@@ -114,11 +92,11 @@ class HardwarePartServiceTest {
 	@Test
 	void updatePartSuccess() {
 		HardwarePart existingPart = new HardwarePart(1L, "Old Name", "Brand", "Case", new BigDecimal("50.00"), 5);
-		HardwarePart updateDetails = new HardwarePart(null, "New Name", "Brand", "Case", new BigDecimal("60.00"), 10);
+		HardwarePartDTO updateDetails = new HardwarePartDTO(null, "New Name", "Brand", "Case", new BigDecimal("60.00"), 10);
+		HardwarePart updatedPart = new HardwarePart(1L, "New Name", "Brand", "Case", new BigDecimal("60.00"), 10);
 		when(hardwarePartRepository.findById(1L)).thenReturn(Optional.of(existingPart));
-		when(hardwarePartRepository.save(any(HardwarePart.class))).thenReturn(existingPart); // Returns the mutated
-																								// object
-		HardwarePart result = hardwarePartService.updatePart(1L, updateDetails);
+		when(hardwarePartRepository.save(any(HardwarePart.class))).thenReturn(updatedPart); 
+		HardwarePartDTO result = hardwarePartService.updatePart(1L, updateDetails);
 		assertEquals("New Name", result.getName());
 		assertEquals(new BigDecimal("60.00"), result.getPrice());
 		assertEquals(10, result.getStockLevel());
@@ -127,8 +105,7 @@ class HardwarePartServiceTest {
 
 	@Test
 	void deletePartSuccess() {
-		HardwarePart existingPart = new HardwarePart(1L, "Mouse", "Logitech", "Peripherals", new BigDecimal("20.00"),
-				5);
+		HardwarePart existingPart = new HardwarePart(1L, "Mouse", "Logitech", "Peripherals", new BigDecimal("20.00"), 5);
 		when(hardwarePartRepository.findById(1L)).thenReturn(Optional.of(existingPart));
 		hardwarePartService.deletePart(1L);
 		verify(hardwarePartRepository, times(1)).findById(1L);
@@ -153,26 +130,5 @@ class HardwarePartServiceTest {
 		assertEquals(1, results.size());
 		verify(hardwarePartRepository, times(1)).findAll();
 		verify(hardwarePartRepository, never()).findByNameContainingIgnoreCase(anyString());
-	}
-
-	@Test
-	void addPartNullPriceThrowsException() {
-		HardwarePart invalidPart = new HardwarePart(null, "No Price CPU", "AMD", "CPU", null, 5);
-		when(hardwarePartRepository.existsByNameIgnoreCase("No Price CPU")).thenReturn(false);
-		InvalidResourceException ex = assertThrows(InvalidResourceException.class,
-				() -> hardwarePartService.addPart(invalidPart));
-		assertEquals("Price cannot be negative or null.", ex.getMessage());
-		verify(hardwarePartRepository, never()).save(any(HardwarePart.class));
-	}
-
-	@Test
-	void addPartNullStockThrowsException() {
-		HardwarePart invalidPart = new HardwarePart(null, "No Stock RAM", "Corsair", "RAM", new BigDecimal("100.00"),
-				null);
-		when(hardwarePartRepository.existsByNameIgnoreCase("No Stock RAM")).thenReturn(false);
-		InvalidResourceException ex = assertThrows(InvalidResourceException.class,
-				() -> hardwarePartService.addPart(invalidPart));
-		assertEquals("Stock level cannot be negative or null.", ex.getMessage());
-		verify(hardwarePartRepository, never()).save(any(HardwarePart.class));
 	}
 }

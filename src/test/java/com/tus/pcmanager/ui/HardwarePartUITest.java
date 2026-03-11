@@ -27,7 +27,6 @@ class HardwarePartUITest {
     private static final By PASSWORD_INPUT = By.id("password");
     private static final By LOGIN_BUTTON = By.id("loginBtn");
     private static final By DASHBOARD_VIEW = By.id("dashboardView");
-    
     private static final By ADD_PART_BTN = By.id("addPartBtn");
     private static final By PART_MODAL = By.id("partModal");
     private static final By PART_NAME_INPUT = By.id("partName");
@@ -38,11 +37,9 @@ class HardwarePartUITest {
     private static final By SAVE_PART_BTN = By.id("savePartBtn");
     private static final By MODAL_ERROR_ALERT = By.id("modalErrorAlert");
     private static final By MODAL_CLOSE_BTN = By.cssSelector("#partModal .btn-close");
-    
     private static final By PARTS_TABLE = By.id("partsTable");
     private static final By TABLE_ROWS = By.cssSelector("#partsTable tbody tr");
     private static final By SEARCH_INPUT = By.cssSelector("input[type='search']");
-    
     private static final By DELETE_CONFIRM_MODAL = By.id("deleteConfirmModal");
     private static final By CONFIRM_DELETE_BTN = By.id("confirmDeleteBtn");
 
@@ -93,11 +90,11 @@ class HardwarePartUITest {
     }
 
     @Test
-    void testInvalidPartAdditionShowsError() {
+    void testNegativePriceShowsValidationErrorMessage() {
         addHardwarePart("Broken RAM", "-50.00", "10");
         ui.waitForVisibility(MODAL_ERROR_ALERT);
-        assertTrue(ui.isElementVisible(MODAL_ERROR_ALERT));
-        assertFalse(ui.getElementText(MODAL_ERROR_ALERT).isEmpty(), "Error message should not be empty");
+        String errorMessage = ui.getElementText(MODAL_ERROR_ALERT);
+        assertTrue(errorMessage.contains("Price must be greater than zero."));
         ui.clickElement(MODAL_CLOSE_BTN);
         ui.waitForInvisibility(PART_MODAL);
     }
