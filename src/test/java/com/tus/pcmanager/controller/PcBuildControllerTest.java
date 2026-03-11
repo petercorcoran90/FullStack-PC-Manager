@@ -64,4 +64,12 @@ class PcBuildControllerTest {
         assertNotNull(response.getBody());
         verify(pcBuildService, times(1)).removePartFromBuild(1L, 10L);
     }
+    
+    @Test
+    void deleteBuildReturnsNoContent() {
+        doNothing().when(pcBuildService).deleteBuild(1L);
+        ResponseEntity<Void> response = pcBuildController.deleteBuild(1L);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(pcBuildService, times(1)).deleteBuild(1L);
+    }
 }

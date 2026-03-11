@@ -33,5 +33,12 @@ public class PcBuildController {
     @DeleteMapping("/{buildId}/parts/{partId}")
     public ResponseEntity<PcBuildDTO> removePartFromBuild(@PathVariable Long buildId, @PathVariable Long partId) {
         return ResponseEntity.ok(buildService.removePartFromBuild(buildId, partId));
+    
+    }
+    
+    @DeleteMapping("/{buildId}")
+    public ResponseEntity<Void> deleteBuild(@PathVariable Long buildId) {
+        buildService.deleteBuild(buildId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -82,3 +82,19 @@ Scenario: Remove a part from a build
   Then status 200
   And match response.parts == '#[0]'
   And match response.totalPrice == 0.00
+  
+Scenario: Delete an entire PC Build
+  # 1. Create a specific build to delete
+  Given path '/api/builds'
+  And headers userAuth
+  And param username = testUsername
+  And param name = 'To Be Deleted PC'
+  When method post
+  Then status 201
+  * def deleteId = response.id
+
+  # 2. Delete it and expect 204 No Content
+  Given path '/api/builds/' + deleteId
+  And headers userAuth
+  When method delete
+  Then status 204

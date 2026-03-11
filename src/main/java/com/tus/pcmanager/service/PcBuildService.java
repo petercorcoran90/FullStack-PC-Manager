@@ -101,4 +101,12 @@ public class PcBuildService {
                 .parts(partDtos)
                 .build();
     }
+    
+    @Transactional
+    public void deleteBuild(Long buildId) {
+        if (!buildRepository.existsById(buildId)) {
+            throw new ResourceNotFoundException("Build not found: " + buildId);
+        }
+        buildRepository.deleteById(buildId);
+    }
 }
