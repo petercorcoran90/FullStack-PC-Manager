@@ -49,8 +49,11 @@ Before running this application, ensure you have the following installed:
 
 ## Default User Accounts
 The system automatically generates the following test accounts on startup:
-* Administrator: Username: admin | Password: admin
-* Standard User: Username: user | Password: user
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Administrator** | `admin` | `admin` |
+| **Standard User** | `user` | `user` |
 
 ## API Documentation (Swagger)
 This project uses OpenAPI (Swagger) for API documentation. While the server is running, you can explore and test the REST API endpoints here:
