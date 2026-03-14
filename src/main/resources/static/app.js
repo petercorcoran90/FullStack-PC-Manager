@@ -15,12 +15,10 @@ globalThis.checkAuthState = function() {
 
     const userRole = localStorage.getItem('currentUser') === "admin" ? "ROLE_ADMIN" : "ROLE_USER";
 
-    // Setup Admin View
     if (userRole === 'ROLE_ADMIN') {
         $('#userBuildsSection, #buildDetailsSection, #navMyBuildsBtn, #analyticsSection, #navCatalogueBtn').addClass('d-none');
         $('#inventorySection, #navAnalyticsBtn').removeClass('d-none');
     } 
-    // Setup User View
     else {
         $('#inventorySection, #buildDetailsSection, #analyticsSection, #navAnalyticsBtn').addClass('d-none');
         $('#userBuildsSection, #navMyBuildsBtn').removeClass('d-none');
@@ -44,7 +42,6 @@ globalThis.loadAnalytics = function() {
             const canvas = document.getElementById('inventoryChart');
             const noDataMsg = document.getElementById('noDataMessage');
 
-            // Handle empty database scenario
             if (!data || data.length === 0) {
                 canvas.style.display = 'none';
                 noDataMsg.classList.remove('d-none');
@@ -57,24 +54,30 @@ globalThis.loadAnalytics = function() {
             const labels = data.map(item => item.category);
             const stockValues = data.map(item => item.totalStock);
 
-            // Destroy the old chart if it exists so they don't overlap
             if (inventoryChartInstance) {
                 inventoryChartInstance.destroy();
             }
 
-            // Draw the Pie Chart
             const ctx = canvas.getContext('2d');
             inventoryChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Total Stock',
-                        data: stockValues,
-                        backgroundColor: ['#c850c0', '#4158d0', '#ffcc70', '#36304a', '#198754', '#0dcaf0'],
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
+					datasets: [{
+					    label: 'Total Stock',
+					    data: stockValues,
+					    backgroundColor: [
+					        '#c850c0', /* Theme Pink */
+					        '#4158d0', /* Theme Blue */
+					        '#ffcc70', /* Theme Yellow */
+					        '#36304a', /* Theme Dark Purple */
+					        '#20c997', /* Vibrant Teal */
+					        '#0dcaf0', /* Bright Cyan */
+					        '#ff6b6b'  /* Coral Red */
+					    ],
+					    borderWidth: 2,
+					    borderColor: '#ffffff'
+					}]
                 },
                 options: {
                     responsive: true,
@@ -91,7 +94,6 @@ globalThis.loadAnalytics = function() {
 $(document).ready(function() {
     globalThis.checkAuthState();
 
-    // Toggle to Analytics Page
     $('#navAnalyticsBtn').click(function() {
         $('#inventorySection').addClass('d-none');
         $('#analyticsSection, #navCatalogueBtn').removeClass('d-none');
@@ -99,7 +101,6 @@ $(document).ready(function() {
         globalThis.loadAnalytics();
     });
 
-    // Toggle back to Catalogue Page
     $('#navCatalogueBtn').click(function() {
         $('#analyticsSection, #buildDetailsSection').addClass('d-none');
         $('#inventorySection').removeClass('d-none');
