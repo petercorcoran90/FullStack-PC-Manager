@@ -13,7 +13,7 @@ A full-stack web application for managing and planning custom PC configurations.
 * **Inventory Management:** Full CRUD operations for hardware parts via dynamic modals.
 * **Hardware Catalogue:** Searchable, sortable, and paginated data tables.
 * **Custom PC Builder:** Add components to custom builds with dynamic total cost calculation.
-* **Inventory Analytics:** Interactive Chart.js visualization of current stock levels by category.
+* **Inventory Analytics:** Interactive Chart.js visualisation of current stock levels by category.
 * **Robust Validation:** Backend data validation with custom exception handling and user-friendly UI alerts.
 
 ## Screenshots
