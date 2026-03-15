@@ -17,7 +17,7 @@ public class HardwarePartController {
     private final HardwarePartService partService;
 
     @GetMapping
-    public ResponseEntity<List<HardwarePartDTO>> getAllParts(@RequestParam(value = "search", required = false) String search) {
+    public ResponseEntity<List<HardwarePartDTO>> getAllParts(@RequestParam(required = false) String search) {
         List<HardwarePartDTO> parts;
         if (search != null && !search.isEmpty()) {
             parts = partService.searchParts(search);
