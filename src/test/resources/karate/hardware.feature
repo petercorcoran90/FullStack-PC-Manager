@@ -40,12 +40,21 @@ Scenario: Delete a Part (DELETE)
   When method delete
   Then status 204
 
-Scenario: Prevent creating a part with negative values
+Scenario: Prevent creating a part with a negative price
   Given path '/api/parts'
-  And request { "name": "Faulty RAM", "manufacturer": "Corsair", "category": "RAM", "price": -10.00, "stockLevel": -5 }
+  # Valid stock level, invalid negative price
+  And request { "name": "Faulty RAM", "manufacturer": "Corsair", "category": "RAM", "price": -10.00, "stockLevel": 5 }
   When method post
   Then status 400
   And match response.message == 'Price must be greater than zero.'
+
+Scenario: Prevent creating a part with a negative stock level
+  Given path '/api/parts'
+  # Valid price, invalid negative stock level
+  And request { "name": "Faulty RAM 2", "manufacturer": "Corsair", "category": "RAM", "price": 50.00, "stockLevel": -5 }
+  When method post
+  Then status 400
+  And match response.message == 'Stock level cannot be negative.'
 
 Scenario: Prevent unauthorized access to Admin endpoints
   * configure headers = { Accept: 'application/json' } # Clear the token
