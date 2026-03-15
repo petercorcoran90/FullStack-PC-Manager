@@ -13,7 +13,7 @@ A full-stack web application for managing and planning custom PC configurations.
 * **Inventory Management:** Full CRUD operations for hardware parts via dynamic modals.
 * **Hardware Catalogue:** Searchable, sortable, and paginated data tables.
 * **Custom PC Builder:** Add components to custom builds with dynamic total cost calculation.
-* **Inventory Analytics:** Interactive Chart.js visualization of current stock levels by category.
+* **Inventory Analytics:** Interactive Chart.js visualisation of current stock levels by category.
 * **Robust Validation:** Backend data validation with custom exception handling and user-friendly UI alerts.
 
 ## Screenshots
@@ -49,8 +49,11 @@ Before running this application, ensure you have the following installed:
 
 ## Default User Accounts
 The system automatically generates the following test accounts on startup:
-* Administrator: Username: admin | Password: admin
-* Standard User: Username: user | Password: user
+
+| Role | Username | Password |
+| :--- | :--- | :--- |
+| **Administrator** | `admin` | `admin` |
+| **Standard User** | `user` | `user` |
 
 ## API Documentation (Swagger)
 This project uses OpenAPI (Swagger) for API documentation. While the server is running, you can explore and test the REST API endpoints here:
